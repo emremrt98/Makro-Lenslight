@@ -10,7 +10,7 @@ const userSchema = new Schema(
       type: String,
       required: [true, "Username area is required"],
       lowercase: true,
-      validate : [validator.isAlphanumeric, "Username area is not alphanumeric"],
+      validate: [validator.isAlphanumeric, "Username area is not alphanumeric"],
     },
     email: {
       type: String,
@@ -24,6 +24,19 @@ const userSchema = new Schema(
       minLength: [4, "At least 4 characters"],
       maxLength: [16, "At most 16 characters"],
     },
+    followers: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      }
+    ],
+
+    followings: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      }
+    ]
   },
   { timestamps: true }
 );

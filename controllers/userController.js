@@ -68,7 +68,8 @@ const loginUser = async (req, res) => {
 
 const getDashboardPage = async (req, res) => {
   const photos = await Photo.find({ user: res.locals.user._id });
-  res.render("dashboard", { link: "dashboard", photos });
+  const user = await User.findById({ _id: res.locals.user._id }).populate(["followings", "followers"]);
+  res.render("dashboard", { link: "dashboard", photos, user });
 };
 
 const createToken = (userId) => {
@@ -92,8 +93,34 @@ const getAllUsers = async (req, res) => {
 const getAUser = async (req, res) => {
   try {
     const user = await User.findById({ _id: req.params.id });
-    const photos = await Photo.find({ user: { $ne: res.locals.user._id } });
-    res.status(200).render("user", { user, photos, link: "user" });
+    const inFollowers = user.followers.some(follower => {
+      return follower.equals(res.locals.user._id);
+    });
+    const photos = await Photo.find({ user: user._id });
+    res.status(200).render("user", { user, photos, link: "user", inFollowers });
+  } catch (error) {
+    res.status(500).json({
+      succedded: false,
+      error: error,
+    });
+  }
+};
+
+const follow = async (req, res) => {
+  try {
+    let user = await User.findByIdAndUpdate(
+      { _id: req.params.id },
+      { $push: { followers: res.locals.user._id } },
+      { new: true }
+    );
+
+    user = await User.findByIdAndUpdate(
+      { _id: res.locals.user._id },
+      { $push: { followings: req.params.id } },
+      { new: true }
+    );
+
+    res.status(200).redirect("back");
   } catch (error) {
     res.status(500).json({
       succedded: false,
@@ -103,4 +130,27 @@ const getAUser = async (req, res) => {
 };
 
 
-export { createUser, loginUser, getDashboardPage, getAllUsers, getAUser };
+const unfollow = async (req, res) => {
+  try {
+    let user = await User.findByIdAndUpdate(
+      { _id: req.params.id },
+      { $pull: { followers: res.locals.user._id } },
+      { new: true }
+    );
+
+    user = await User.findByIdAndUpdate(
+      { _id: res.locals.user._id },
+      { $pull: { followings: req.params.id } },
+      { new: true }
+    );
+
+    res.status(200).redirect("back");
+  } catch (error) {
+    res.status(500).json({
+      succedded: false,
+      error: error,
+    });
+  }
+};
+
+export { createUser, loginUser, getDashboardPage, getAllUsers, getAUser, follow, unfollow };
