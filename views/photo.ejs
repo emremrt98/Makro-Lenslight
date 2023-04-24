@@ -1,0 +1,39 @@
+<%- include('partials/_header') %>
+   <!-- body -->
+
+   <body class="main-layout inner_page">
+      <!-- loader  -->
+      <%- include('partials/_loader') %>
+         <!-- end loader -->
+
+         <!-- header -->
+         <%- include('partials/_menu') %>
+            <!-- end header inner -->
+            <!-- about -->
+            <div class="about">
+               <div class="container">
+                  <div class="row">
+                     <div class="col-md-6">
+                        <div class="titlepage text_align_left">
+                           <h2>
+                              <%= photo.title %>
+                           </h2>
+                           <p>
+                              <%= photo.description.substring(0,80)+"..." %>
+                           </p>
+                           <a class="read_more" href="/users/<%= photo.user._id  %>">
+                              Artist: <%= photo.user.username %>
+                           </a>
+                        </div>
+                     </div>
+                     <div class="col-md-6">
+                        <div class="about_img">
+                           <figure><img src=<%=photo.url %> alt="#" /></figure>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <!-- end about -->
+            <!-- start footer -->
+            <%- include('partials/_footer') %>

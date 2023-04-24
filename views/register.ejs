@@ -1,0 +1,116 @@
+<%- include('partials/_header') %>
+   <!-- body -->
+
+   <body class="main-layout inner_page">
+      <!-- loader  -->
+      <%- include('partials/_loader') %>
+         <!-- end loader -->
+
+         <!-- header -->
+         <%- include('partials/_menu') %>
+            <!-- end header inner -->
+            <!-- contact -->
+            <div class="contact">
+               <div class="container">
+                  <div class="row">
+                     <div class="col-md-12 ">
+                        <div class="titlepage text_align_center">
+                           <h2>Register</h2>
+                        </div>
+                     </div>
+                     <div class="col-md-8 offset-md-2">
+                        <form id="request" class="main_form" action="/users/register" method="post">
+                           <div class="row">
+                              <div class="col-md-12">
+                                 <input class="form_control" placeholder="Kullanıcı Adınız" type="type" name="username">
+                              </div>
+                              <div class="col-md-12">
+                                 <div style="display: none;" class="alert alert-danger" id="username"></div>
+                              </div>
+                              <div class="col-md-12">
+                                 <input class="form_control" placeholder="E-Mail Giriniz" type="type" name="email">
+                              </div>
+                              <div class="col-md-12">
+                                 <div style="display: none;" class="alert alert-danger" id="email"></div>
+                              </div>
+                              <div class="col-md-12">
+                                 <input class="form_control" placeholder="Şifreniz" type="password" name="password">
+                              </div>
+                              <div class="col-md-12">
+                                 <div style="display: none;" class="alert alert-danger" id="password"></div>
+                              </div>
+                              <div class="col-md-12">
+                                 <div class="group_form">
+                                    <button type="submit" class="send_btn">Sign In</button>
+                                 </div>
+                              </div>
+                           </div>
+                        </form>
+                     </div>
+                  </div>
+               </div>
+            </div>
+
+            <script>
+               const form = document.querySelector('form')
+               const emailError = document.querySelector('#email')
+               const passwordError = document.querySelector('#password')
+               const usernameError = document.querySelector('#username')
+
+               form.addEventListener("submit", async (e) => {
+                  e.preventDefault();
+
+                  emailError.textContent = "";
+                  passwordError.textContent = "";
+                  usernameError.textContent = "";
+                  emailError.style.display = "none"
+                  passwordError.style.display = "none"
+                  usernameError.style.display = "none"
+
+                  const email = form.email.value
+                  const password = form.password.value
+                  const username = form.username.value
+                  try {
+                     const res = await fetch('users/register', {
+                        method: "POST",
+                        body: JSON.stringify({ email, password, username }),
+                        headers: { "Content-Type": "application/json" }
+                     })
+
+                     const data = await res.json();
+
+                    
+                     if (typeof data !== 'undefined' && Object.getOwnPropertyNames(data).length !== 0) {
+                        console.log(!data.errors.email);
+                        if (data.errors.email != undefined) {
+                           emailError.textContent = data.errors.email
+                           emailError.style.display = "block"
+                        }
+
+                        if (data.errors.password != undefined) {
+                           passwordError.textContent = data.errors.password
+                           passwordError.style.display = "block"
+                        }
+
+                        if (data.errors.username != undefined) {
+                           usernameError.textContent = data.errors.username
+                           usernameError.style.display = "block"
+                        }
+
+                     }
+
+                     // if (data.user) {
+                     //    location.assign("/login");
+                     // }
+
+                  } catch (err) {
+                     console.log("ERR::", err);
+                  };
+               });
+            </script>
+
+
+
+            <!-- end contact -->
+            <!-- start footer -->
+            <%- include('partials/_footer') %>
