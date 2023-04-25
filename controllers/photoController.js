@@ -34,6 +34,8 @@ const createPhoto = async (req, res) => {
 const getAllPhotos = async (req, res) => {
   try {
     const photos = await Photo.find(res.locals.user && { user: { $ne: res.locals.user._id } });
+    console.log(photos);
+    console.log(res.locals.user);
     res.status(200).render("photos", { photos, link: "photos" });
   } catch (error) {
     res.status(500).json({
@@ -71,4 +73,41 @@ const deletePhoto = async (req, res) => {
   }
 };
 
-export { createPhoto, getAllPhotos, getAPhotos, deletePhoto };
+const updatePhoto = async (req, res) => {
+  try {
+    const photo = await Photo.findById(req.params.id);
+
+    if (req.files) {
+      const photoId = photo.image_id;
+      await cloudinary.uploader.destroy(photoId);
+
+      const result = await cloudinary.uploader.upload(
+        req.files.image.tempFilePath,
+        {
+          use_filename: true,
+          folder: 'lenslight_tr'
+        }
+      );
+
+      photo.url = result.secure_url;
+      photo.image_id = result.public_id;
+      fs.unlinkSync(req.files.image.tempFilePath);
+    }
+
+    photo.name = req.body.name;
+    photo.description = req.body.description;
+
+    photo.save();
+
+    res.status(200).redirect('/');
+
+  } catch (error) {
+    res.status(500).json({
+      succedded: false,
+      error: error,
+    });
+  }
+};
+
+
+export { createPhoto, getAllPhotos, getAPhotos, deletePhoto, updatePhoto };

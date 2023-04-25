@@ -7,4 +7,5 @@ router.post("/", photoController.createPhoto);
 router.get("/", photoController.getAllPhotos);
 router.get("/:id", photoController.getAPhotos);
 router.delete("/:id", photoController.deletePhoto);
+router.put("/:id", photoController.updatePhoto);
 export default router;
